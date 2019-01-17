@@ -1,0 +1,37 @@
+#device config
+device_name: /dev/ttyUSB0
+baud_rate: 1000000
+scan_range: 10
+profile_velocity: 200
+profile_acceleration: 50
+#motor network id_list
+dmx_id:
+  head: 1
+  right_shoulder: 2
+  right_elbow: 3
+  left_shoulder: 4
+  left_elbow: 5
+#motor step resolution
+step_res: 0.29 # degrees/step  (The range of the value is 0~1023 (0x3FF) ref AX-12A)
+motor_reference: AX-12A
+#articular ranges for dynamixel motors
+head_limit:
+  min: 10
+  origin: 47
+  max: 20
+right_shoulder_limit:
+  min: 20
+  origin: 0
+  max: 50
+right_elbow_limit:
+  min: 12
+  origin: 0
+  max: 12
+left_shoulder_limit:
+  min: 20
+  origin: 0
+  max: 30
+left_elbow_limit:
+  min: 20
+  origin: 0
+  max: 30
