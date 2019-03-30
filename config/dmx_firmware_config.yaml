@@ -12,6 +12,12 @@
 origin:
   head: 350
   right_shoulder: 550
-  right_elbow: 950
+  right_elbow: 870
+  left_shoulder: 370
+  left_elbow: 370
+angle_rate:
+  head: 1 #
+  right_shoulder: 550 #355/90
+  right_elbow: 950    #650/90
   left_shoulder: 370
   left_elbow: 75

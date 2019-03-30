@@ -83,6 +83,11 @@ class DmxManager(object):
         for joint in pos:
             service.service_request_threaded(id = self.ids[joint], val = pos[joint])
 
+    def set_speed(self, speed):
+        service = dmx_firmware.DmxCommandClientService(service_name = self.goal_speed_srv)
+        for joint in speed:
+            service.service_request_threaded(id = self.ids[joint], val = speed[joint])
+
 
 
     #TODO: move to next layer
@@ -97,6 +102,58 @@ class DmxManager(object):
         self.set_position(safe_position)
 
 
+
+    def rotate_head_right(self):
+        #print self.head_info
+
+        pos = {'head':self.head_info['CW_Angle_Limit']}
+        self.set_position(pos)
+
+    def rotate_head_left(self):
+        #print self.head_info
+
+        pos = {'head':self.head_info['CCW_Angle_Limit']}
+        self.set_position(pos)
+
+    def rotate_head(self, angle):
+        pos = {'head':angle}
+        self.set_position(pos)
+
+    def point_routine(self):
+        self.set_safety_position()
+        time.sleep(3)
+        self.rotate_head(angle = self.head_info['CCW_Angle_Limit']*3/4)
+        self.set_position({'left_elbow':1000})
+
+    def routine1(self):
+        for i in range(5):
+            self.open_arms()
+            self.rotate_head_right()
+            time.sleep(3)
+            self.set_safety_position()
+            self.rotate_head_left()
+            time.sleep(3)
+
+    def routine2(self):
+        self.set_speed({
+                            'head':           200,
+                            'right_shoulder': 200,
+                            'right_elbow':    200,
+                            'left_shoulder':  200,
+                            'left_elbow':     200
+                        })
+        self.set_safety_position()
+        time.sleep(3)
+        for i in range(5):
+            print i
+            self.set_position({'left_elbow':1000, 'right_elbow':70})
+            time.sleep(3)
+            self.set_safety_position()
+
+            time.sleep(3)
+
+
+
     #set safety motor position for the robot
     def set_safety_position(self):
         rospy.loginfo("setting safety position")
@@ -105,7 +162,7 @@ class DmxManager(object):
                             'right_shoulder': self.origin["right_shoulder"],
                             'right_elbow':    self.origin["right_elbow"],
                             'left_shoulder':  self.origin["left_shoulder"],
-                            #'left_elbow':     self.origin["left_elbow"]
+                            'left_elbow':     self.origin["left_elbow"]
                         }
         self.set_position(safe_position)
 
@@ -139,58 +196,23 @@ if __name__ == '__main__':
     man = DmxManager()
 
     #rospy.on_shutdown(man.shutdown)
+    #man.routine1()
 
-    man.set_stiffness(True)
+    man.point_routine()
+    time.sleep(3)
+    man.set_safety_position()
 
+    man.routine1()
+    time.sleep(3)
+    man.set_safety_position()
 
+    time.sleep(2)
+    
+    man.routine2()
+    time.sleep(3)
     man.set_safety_position()
 
 
-    time.sleep(3)
-
-    man.open_arms()
-    man.set_position({"head": 50})
-    man.set_position({"right_elbow": 950})
-
-    time.sleep(5)
-
-    man.set_safety_position()
-
-    time.sleep(3)
-
-    man.open_arms()
-    man.set_position({"head": 650})
-    man.set_position({"right_elbow": 600})
-
-    time.sleep(5)
-
-    man.set_safety_position()
-
-    time.sleep(3)
-
-    man.open_arms()
-    man.set_position({"head": 50})
-    man.set_position({"right_elbow": 950})
-
-    time.sleep(5)
-
-    man.set_safety_position()
-
-    time.sleep(3)
-
-    man.open_arms()
-    man.set_position({"head": 650})
-    man.set_position({"right_elbow": 600})
-
-    time.sleep(5)
-
-    man.set_safety_position()
-
-    time.sleep(3)
-
-    man.set_stiffness(False)
-    #man.set_stiffness(False)
-    #man.initial_protocol()
 
     while not (rospy.is_shutdown()):
         man.main_loop()
